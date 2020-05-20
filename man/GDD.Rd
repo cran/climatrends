@@ -2,87 +2,162 @@
 % Please edit documentation in R/GDD.R
 \name{GDD}
 \alias{GDD}
+\alias{GDD.default}
+\alias{GDD.data.frame}
+\alias{GDD.array}
+\alias{GDD.sf}
 \title{Growing degree-days}
 \usage{
-GDD(object, day.one = NULL, degree.days = NULL, base = 10, span = 150, ...)
+GDD(object, ..., tbase = 10)
+
+\method{GDD}{default}(object, tmin, ..., tbase = 10)
+
+\method{GDD}{data.frame}(object, day.one, ..., tbase = 10)
+
+\method{GDD}{array}(object, day.one, ..., tbase = 10)
+
+\method{GDD}{sf}(object, day.one, ..., tbase = 10, as.sf = TRUE)
 }
 \arguments{
-\item{object}{a numeric vector of geographic coordinates (lonlat) or
-an array with two dimensions containing the temperature data;
-1st dimension contains the day temperature and 2nd dimension the night
-temperature. When lonlat is used, the function makes a call to
-\code{nasapower::get_power()} to fetch and concatenate environmental
-data from NASA POWER (\url{https://power.larc.nasa.gov/}) for the parameters
-T2M_MAX (Maximum Temperature at 2 m) and 
-T2M_MIN (Minimum Temperature at 2 m)}
+\item{object}{a numeric vector with the maximum temperature, 
+or a data.frame with geographical coordinates (lonlat), 
+or an object of class \code{sf} with geometry 'POINT' or 'POLYGON', 
+or an \code{array} with two dimensions containing the
+maximum and minimum temperature, in that order. See details}
 
-\item{day.one}{a vector of class \code{Date} for the starting date to 
-capture the environmental data (YYYY-MM-DD)}
+\item{...}{additional arguments passed to methods. See details}
 
-\item{degree.days}{an integer for the degree-days required by the 
-organism (look for the physiology of the focal organism)}
+\item{tbase}{an integer for the minimum temperature for growth}
 
-\item{base}{an integer for the base temperature}
+\item{tmin}{a numeric vector with the minimum temperature}
 
-\item{span}{an integer or a vector with integers for the duration 
-of the timespan to be captured}
+\item{day.one}{a vector of class \code{Date} or any other object that can be 
+coerced to \code{Date} (e.g. integer, character YYYY-MM-DD) for the starting 
+day to capture the climate data}
 
-\item{...}{additional arguments passed to 
-\code{\link[nasapower]{get_power}} methods}
+\item{as.sf}{logical, to return an object of class 'sf'}
 }
 \value{
-The number of days required to reach the growing degree-days.
+The number of days to reach the accumulated \var{degree.days} or the daily degree-days 
+  as defined with the argument \var{return.as}
 }
 \description{
-Compute number of days required to reach Growing degree-days.
-GDD is a heuristic tool in phenology that measures heat 
-accumulation and is used to predict plant and animal development 
-rates. Growing degree-days are calculated by taking the 
-integral of warmth above a base temperature.
+This a heuristic tool in phenology that measures heat accumulation and 
+is used to predict plant and animal development rates. Growing degree-days
+are calculated by taking the integral of warmth above a base temperature.
+}
+\details{
+Additional arguments:
+
+\code{tbase_max} optional, the maximum tbase temperature, 
+ required if \code{equation = "c"}   
+
+\code{return.as} character (one of, the default, \code{"acc"} or \code{"daily"},
+ \code{"ndays"}) to select if the function returns the accumulated gdd, or the 
+ daily values of gdd across the series of the number of days required to reach a
+ certain number of \code{degree.days}
+ 
+\code{degree.days} an integer for the accumulated degree-days required by the 
+ organism. Optional if \var{return.as = "daily"} or \var{return.as = "acc"} 
+
+\code{equation} character to specify the equation to be used, one of \code{"default"},
+\code{"a"}, \code{"b"} or \code{"c"}. See Equations below 
+
+\code{dates}: a character (or Date or numeric) vector for the dates of tmax and tmin
+ in the \code{default} method
+
+\code{last.day}: an object (optional to \var{span}) of class \code{Date} or
+ any other object that can be coerced to \code{Date} (e.g. integer, character 
+ YYYY-MM-DD) for the last day of the time series. For \code{data.frame}, 
+ \code{array} and \code{sf} methods
+ 
+\code{span}: an integer (optional to \var{last.day}) or a vector with 
+ integers (optional if \var{last.day} is given) for the length of 
+ the time series to be captured. For \code{data.frame}, \code{array} 
+ and \code{sf} methods
+
+S3 Methods:
+
+The \code{array} method assumes that \var{object} contains climate data available 
+ in your R section; this requires an array with two dimensions, 1st dimension 
+ contains the day temperature and 2nd dimension the night temperature, 
+ see help("temp_dat", package = "climatrends") for an example on input structure.
+
+The \code{data.frame} and \code{sf} methods assumes that the climate data
+ will e fetched from a remote (cloud) source that be adjusted using the argument 
+ \var{data.from}
+
+ 
+Equations: 
+ 
+ \code{"default"}: GDD = ((tmax + tmin) / 2) - tbase
+ 
+ \code{"a"}: GDD = max(GDD, 0)
+ 
+ \code{"b"}: adjust tmin = tbase if tmin < tbase,
+  adjust tmax = tbase if tmax < tbase
+ 
+ \code{"c"}: adjust tmin = tbase if tmin < tbase, 
+  adjust tmax = tbase_max if tmax < tbase_max
 }
 \examples{
-# Using local sources
-data("modis", package = "climatrends")
+data("innlandet", package = "climatrends")
 
-day <- as.Date("2013-10-28", format = "\%Y-\%m-\%d")
+# use the default equation, but in this case it returns negative values
+GDD(innlandet$tmax, innlandet$tmin, tbase = 2)
 
-GDD(modis, 
-    day.one = day,
-    degree.days = 100, 
-    base = 5,
-    span = 13)
+# set the equation "b", which is a better option for this case
+# tmin = tbase if tmin < tbase 
+# tmax = tbase if tmax < tbase
+GDD(innlandet$tmax, innlandet$tmin, tbase = 2, equation = "b")
+
+
+#####################################################
+
+# return as the number of days required to reach a certain accumulated GDD
+# use equation "c", which adjusts tmax base on a tbase_max
+data("temp_dat", package = "climatrends")
+
+GDD(temp_dat, 
+    day.one = "2013-10-27", 
+    degree.days = 90, 
+    return.as = "ndays", 
+    tbase_max = 32,
+    equation = "c")
 
 \donttest{
-# Using NASA POWER
+#####################################################
+
+# use the S3 method for data.frame to fetch data from nasapower
+
 library("nasapower")
 
-set.seed(123)
-# random geographic locations around bbox(11, 12, 55, 58)
-lonlat <- data.frame(lon = runif(3, 11, 12),
-                     lat = runif(3, 55, 58))
+lonlat <- data.frame(lon = c(-73.3, -74.5),
+                     lat = c(-6.1, - 6.2))
 
-set.seed(321)
-# random dates around 2018-05-15 and 2018-05-20
-dates <- as.integer(runif(3, 17666, 17670))
-dates <- as.Date(dates, origin = "1970-01-01")
-
-# Calculate the days required for the plants in these plots to reach the
-# maturity. Here the plant species requires ~1300 degree days for it.
 GDD(lonlat, 
-    day.one = dates,
-    degree.days = 1300,
-    base = 5)
-}
+    day.one = "2015-05-01", 
+    last.day = "2015-09-30",
+    equation = "c",
+    tbase_max = 35)
 
+}
 }
 \references{
 Prentice I. C., et al. (1992) Journal of Biogeography, 19(2), 117. 
 \cr\url{https://doi.org/10.2307/2845499}
+
+Baskerville, G., & Emin, P. (1969). Ecology, 50(3), 514-517. 
+\cr\url{https://doi.org/10.2307/1933912}
 }
 \seealso{
-Other climatology functions: 
+Other temperature functions: 
 \code{\link{ETo}()},
-\code{\link{rainfall}()},
+\code{\link{crop_sensitive}()},
 \code{\link{temperature}()}
+
+Other GDD functions: 
+\code{\link{late_frost}()}
 }
-\concept{climatology functions}
+\concept{GDD functions}
+\concept{temperature functions}

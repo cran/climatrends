@@ -2,41 +2,51 @@
 % Please edit documentation in R/temperature.R
 \name{temperature}
 \alias{temperature}
+\alias{temperature.default}
+\alias{temperature.data.frame}
+\alias{temperature.array}
+\alias{temperature.sf}
 \title{Temperature indices}
 \usage{
-temperature(
+temperature(object, ...)
+
+\method{temperature}{default}(object, tmin, ..., timeseries = FALSE)
+
+\method{temperature}{data.frame}(object, day.one, span = NULL, ..., timeseries = FALSE)
+
+\method{temperature}{array}(object, day.one, span = NULL, ..., timeseries = FALSE)
+
+\method{temperature}{sf}(
   object,
-  day.one = NULL,
-  span = 150,
+  day.one,
+  span = NULL,
+  ...,
   timeseries = FALSE,
-  intervals = 5,
-  ...
+  as.sf = TRUE
 )
 }
 \arguments{
-\item{object}{a numeric vector of geographic coordinates (lonlat) or
-an array with two dimensions containing the temperature data;
-1st dimension contains the day temperature and 2nd dimension the night
-temperature. When lonlat is used, the function makes a call to
-\code{nasapower::get_power()} to fetch and concatenate environmental
-data from NASA POWER (\url{https://power.larc.nasa.gov/}) for the parameters
-T2M_MAX (Maximum Temperature at 2 m) and 
-T2M_MIN (Minimum Temperature at 2 m)}
+\item{object}{a numeric vector with the maximum temperature, 
+or a data.frame with geographical coordinates (lonlat), 
+or an object of class \code{sf} with geometry 'POINT' or 'POLYGON', 
+or an \code{array} with two dimensions containing the
+maximum and minimum temperature, in that order. See details}
 
-\item{day.one}{a vector of class \code{Date} for the starting date to 
-capture the environmental data (YYYY-MM-DD)}
+\item{...}{additional arguments passed to methods. See details}
 
-\item{span}{an integer or a vector with integers for the duration 
-of the timespan to be captured}
+\item{tmin}{a numeric vector with the minimum temperature}
 
 \item{timeseries}{logical, \code{FALSE} for a single point time series
 observation or \code{TRUE} for a time series based on \var{intervals}}
 
-\item{intervals}{integer no lower than 5, for the days intervals when
-\var{timeseries} = \code{TRUE}}
+\item{day.one}{a vector of class \code{Date} or any other object that can be 
+coerced to \code{Date} (e.g. integer, character YYYY-MM-DD) for the starting 
+day to capture the climate data}
 
-\item{...}{additional arguments passed to 
-\code{\link[nasapower]{get_power}} methods}
+\item{span}{an integer or a vector with integers (optional if \var{last.day} is 
+given) for the length of the time series to be captured}
+
+\item{as.sf}{logical, to return an object of class 'sf'}
 }
 \value{
 A dataframe with temperature indices:
@@ -52,61 +62,113 @@ and NT (degree Celsius)) }
 temperature > 25 (degree Celsius)}
 \item{CFD}{consecutive frosty days, number of days with temperature 
 bellow 0 degree Celsius}
-
- When \var{timeseries} = \code{TRUE}, an id is created, 
- which is the index for the rownames of the provided \var{object}.
+\item{WSDI}{maximum warm spell duration, consecutive days with 
+temperature > 90th percentile}
+\item{CSDI}{maximum cold spell duration, consecutive nights with 
+temperature < 10th percentile}
+\item{T10p}{the 10th percentile of night tempeture (degree Celsius)}
+\item{T90p}{the 90th percentile of day tempeture (degree Celsius)}
 }
 \description{
-Compute temperature indices over a timespan
+Methods to compute temperature indices over a time series
+}
+\details{
+Additional arguments:
+
+\code{intervals}: an integer (no lower than 5), for the days intervals when
+ \var{timeseries = TRUE}
+
+\code{last.day}: optional to \var{span}, an object of class \code{Date} or
+ any other object that can be coerced to \code{Date} (e.g. integer, character 
+ YYYY-MM-DD)  for the last day of the time series. For \code{data.frame}, \code{array} 
+ and \code{sf} methods
+ 
+\code{dates}: a character (or Date or numeric) vector for the dates of tmax and tmin
+ in the \code{default} method
+
+\code{data.from}: character for the source of remote data. Current remote source 
+ is: 'nasapower'
+
+\code{pars}: character vector for the temperature data to be fetched. If 
+ \code{data.from} is 'nasapower', the temperature can be adjusted to 2 m, the default,
+ c("T2M_MAX", "T2M_MIN") or 10 m c("T10M_MAX", "T10M_MIN") 
+
+\code{days.before}: optional, an integer for the number of days before 
+ \var{day.one} to be included in the timespan.
+
+
+# S3 Methods
+
+The \code{array} method assumes that \var{object} contains climate data available 
+ in your R section; this requires an array with two dimensions, 1st dimension 
+ contains the day temperature and 2nd dimension the night temperature, 
+ see help("temp_dat", package = "climatrends") for an example on input structure.
+
+The \code{data.frame} and the \code{sf} methods assumes that the climate data
+ will be fetched from a remote (cloud) source that be adjusted using the argument 
+ \var{data.from}.
+
+When \var{timeseries = TRUE}, an id is created, 
+ which is the index for the rownames of the inputted \var{object}.
 }
 \examples{
-# Using local sources
-data("modis", package = "climatrends")
+# the default method
+data("innlandet", package = "climatrends")
 
-day <- as.Date("2013-10-28", format = "\%Y-\%m-\%d")
+# a single temporal observation
+temperature(innlandet$tmax, innlandet$tmin)
 
-temperature(modis, 
-            day.one = day,
+# return as timeseries with 30-day intervals
+temperature(innlandet$tmax, 
+            innlandet$tmin, 
+            dates = innlandet$dates,
+            timeseries = TRUE, 
+            intervals = 30)
+
+#####################################################
+
+# array method
+data("temp_dat", package = "climatrends")
+
+temperature(temp_dat,
+            day.one = "2013-10-28",
             span = 12)
 
 \donttest{
-# Using NASA POWER
+#####################################################
+
+# Using remote sources of climate data
 library("nasapower")
+data("lonlatsf", package = "climatrends")
 
-# random points within bbox(11, 12, 55, 58)
-set.seed(123)
-lonlat <- data.frame(lon = runif(3, 11, 12),
-                     lat = runif(3, 55, 58))
+# some random dates provided as integers and coerced to Dates internally
+set.seed(2718279)
+dates <- as.integer(runif(5, 17660, 17675))
 
-# random dates within 2018-05-15 and 2018-05-2
-set.seed(321)
-dates <- as.integer(runif(3, 17666, 17670))
-dates <- as.Date(dates, origin = "1970-01-01")
+# get temperature indices for 30 days after day.one
+# return a data.frame
+temp1 <- temperature(lonlatsf,
+                     day.one = dates,
+                     span = 30,
+                     as.sf = FALSE)
+temp1
 
-# get temperature indices for 40 days after day.one
-temperature(lonlat,
-            day.one = dates,
-            span = 40)
+# get temperature indices from "2010-12-01" to "2011-01-31"
+temp2 <- temperature(lonlatsf,
+                     day.one = "2010-12-01",
+                     last.day = "2011-01-31")
+temp2
 
-# get temperature indices over a time series
-temperature(lonlat,
-            day.one = dates,
-            span = 40,
-            timeseries = TRUE,
-            intervals = 5)
 }
 }
 \references{
 Aguilar E., et al. (2005). Journal of Geophysical Research, 
 110(D23), D23107. \cr\url{https://doi.org/10.1029/2005JD006119}
-
-Sparks A. H. (2018). Journal of Open Source Software, 3(30), 1035. 
-\cr\url{https://doi.org/10.21105/joss.01035}
 }
 \seealso{
-Other climatology functions: 
+Other temperature functions: 
 \code{\link{ETo}()},
 \code{\link{GDD}()},
-\code{\link{rainfall}()}
+\code{\link{crop_sensitive}()}
 }
-\concept{climatology functions}
+\concept{temperature functions}

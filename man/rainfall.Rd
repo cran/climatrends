@@ -2,39 +2,41 @@
 % Please edit documentation in R/rainfall.R
 \name{rainfall}
 \alias{rainfall}
+\alias{rainfall.default}
+\alias{rainfall.data.frame}
+\alias{rainfall.matrix}
+\alias{rainfall.sf}
 \title{Rainfall indices}
 \usage{
-rainfall(
-  object,
-  day.one = NULL,
-  span = 150,
-  timeseries = FALSE,
-  intervals = 5,
-  ...
-)
+rainfall(object, ...)
+
+\method{rainfall}{default}(object, ..., timeseries = FALSE)
+
+\method{rainfall}{data.frame}(object, day.one, span = NULL, ..., timeseries = FALSE)
+
+\method{rainfall}{matrix}(object, day.one, span = NULL, ..., timeseries = FALSE)
+
+\method{rainfall}{sf}(object, day.one, span = NULL, ..., timeseries = FALSE, as.sf = TRUE)
 }
 \arguments{
-\item{object}{a numeric vector of geographic coordinates (lonlat) or
-a matrix containing the precipitation data.
-When lonlat is used, the function makes a call to
-\code{nasapower::get_power} to fetch and concatenate environmental 
-data from NASA POWER (\url{https://power.larc.nasa.gov/})
-for the parameter PRECTOT (precipitation)}
+\item{object}{a numeric vector with precipitation data or a \code{data.frame}
+with geographical coordinates (lonlat), or an object of class \code{sf} 
+with geometry 'POINT' or 'POLYGON', or a named \code{matrix} with 
+precipitation data. See details.}
 
-\item{day.one}{a vector of class \code{Date} for the starting date to 
-capture the environmental data (YYYY-MM-DD)}
-
-\item{span}{an integer or a vector with integers for the duration 
-of the timespan to be captured}
+\item{...}{additional arguments passed to methods. See details.}
 
 \item{timeseries}{logical, \code{FALSE} for a single point time series
 observation or \code{TRUE} for a time series based on \var{intervals}}
 
-\item{intervals}{integer no lower than 5, for the days intervals when
-\var{timeseries} = \code{TRUE}}
+\item{day.one}{a vector of class \code{Date} or any other object that can be 
+coerced to \code{Date} (e.g. integer, character YYYY-MM-DD) for the starting 
+day to capture the climate data}
 
-\item{...}{additional arguments passed to 
-\code{\link[nasapower]{get_power}} methods}
+\item{span}{an integer or a vector with integers (optional if \var{last.day} is 
+given) for the length of the time series to be captured}
+
+\item{as.sf}{logical, to return an object of class 'sf'}
 }
 \value{
 A dataframe with rainfall indices:
@@ -49,69 +51,93 @@ A dataframe with rainfall indices:
 \item{Rtotal}{total precipitation (mm) in wet days, rain >= 1 (mm)}
 \item{SDII}{simple daily intensity index, total precipitation divided by the
  number of wet days (mm/days)}
- 
- When \var{timeseries} = \code{TRUE}, an id is created, 
- which is the index for the rownames of the provided \var{object}.
 }
 \description{
-Compute rainfall indices over a timespan
+Methods to compute rainfall indices over a time series
+}
+\details{
+#' Additional arguments:
+
+\code{intervals}: an integer (no lower than 5), for the days intervals when
+ \var{timeseries = TRUE}
+ 
+\code{last.day}: optional to \var{span}, an object of class \code{Date} or
+ any other object that can be coerced to \code{Date} (e.g. integer, character 
+ YYYY-MM-DD)  for the last day of the time series
+ 
+\code{dates}: a character (or Date or numeric) vector for the dates of tmax and tmin
+ in the \code{default} method
+
+\code{data.from}: character for the source of remote data. Current remote source 
+ is: 'nasapower'
+
+\code{pars}: character vector for the precipitation data to be fetched. If 
+ \code{data.from} is 'nasapower', the default precipitation parameter is "PRECTOT".
+
+\code{days.before}: optional, an integer for the number of days before 
+ \var{day.one} to be included in the timespan.
+ 
+# S3 Methods 
+
+The \code{matrix} method assumes that \var{object} contains climate data available in
+ your R section; see help("rain_dat", package = "climatrends") for an example on input 
+ structure.
+
+The \code{data.frame} and the \code{sf} methods assumes that the climate data
+ will e fetched from a remote (cloud) source that be adjusted using the argument 
+ \var{data.from}.
+
+When \var{timeseries} = \code{TRUE}, an id is created, 
+ which is the index for the rownames of the inputted \var{object}.
 }
 \examples{
-# Using local sources
-data("chirp", package = "climatrends")
+# A vector with precipitation data
+set.seed(987219)
+rain <- runif(50, min = 0, max = 6)
 
-day <- as.Date("2013-10-28", format = "\%Y-\%m-\%d")
+rainfall(rain)
 
-rainfall(chirp,
-         day.one = day,
-         span = 11)
+# Return as timeseries with intervals of 7 days
+dates <- 17650:17699
+rainfall(rain, dates = dates, timeseries = TRUE, intervals = 7)
 
+######################################################
+
+# the matrix method
+data("rain_dat", package = "climatrends")
+
+rainfall(rain_dat,
+         day.one = "2013-10-28",
+         span = 12)
+
+#####################################################
 \donttest{
-# Using NASA POWER
+# Using remote sources of climate data
 library("nasapower")
+data("lonlatsf", package = "climatrends")
 
-# random points within bbox(11, 12, 55, 58)
-set.seed(123)
-lonlat <- data.frame(lon = runif(3, 11, 12),
-                     lat = runif(3, 55, 58))
+# some random dates provided as integers and coerced to Dates internally
+set.seed(2718279)
+dates <- as.integer(runif(5, 17660, 17675))
 
-# random dates within 2018-05-15 and 2018-05-20
-set.seed(321)
-dates <- as.integer(runif(3, 17666, 17670))
-dates <- as.Date(dates, origin = "1970-01-01")
+# get precipitation indices for 30 days after day.one
+# return a data.frame
+rain1 <- rainfall(lonlatsf,
+                  day.one = dates,
+                  span = 30,
+                  as.sf = FALSE)
+rain1
 
-# calculate rainfall for the first 50 days after day.one
-rainfall(lonlat,
-         day.one = dates,
-         span = 50)
+# get precipitation indices from "2010-12-01" to "2011-01-31"
+rain2 <- rainfall(lonlatsf,
+                  day.one = "2010-12-01",
+                  last.day = "2011-01-31")
+rain2
+}
 
-
-# include the first 15 days before day.one (residual precipitation)
-rainfall(lonlat,
-         day.one = dates,
-         span = 50,
-         days.before = 15)
-
-# rainfall indices over a time series          
-rainfall(lonlat,
-         day.one = dates,
-         span = 50,
-         timeseries = TRUE,
-         intervals = 7)
-}       
-         
 }
 \references{
 Aguilar E., et al. (2005). Journal of Geophysical Research, 
 110(D23), D23107. \cr\url{https://doi.org/10.1029/2005JD006119}
-
-Sparks A. H. (2018). Journal of Open Source Software, 3(30), 1035. 
-\cr\url{https://doi.org/10.21105/joss.01035}
 }
-\seealso{
-Other climatology functions: 
-\code{\link{ETo}()},
-\code{\link{GDD}()},
-\code{\link{temperature}()}
-}
-\concept{climatology functions}
+\concept{precipitation functions}

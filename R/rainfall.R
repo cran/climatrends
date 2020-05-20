@@ -1,14 +1,51 @@
 #' Rainfall indices
 #'
-#' Compute rainfall indices over a timespan
+#' Methods to compute rainfall indices over a time series
 #'
-#' @param object a numeric vector of geographic coordinates (lonlat) or
-#' a matrix containing the precipitation data.
-#' When lonlat is used, the function makes a call to
-#' \code{nasapower::get_power} to fetch and concatenate environmental 
-#' data from NASA POWER (\url{https://power.larc.nasa.gov/})
-#' for the parameter PRECTOT (precipitation)
-#' @inheritParams temperature
+#' @family precipitation functions
+#' @inheritParams get_timeseries
+#' @param object a numeric vector with precipitation data or a \code{data.frame}
+#'  with geographical coordinates (lonlat), or an object of class \code{sf} 
+#'  with geometry 'POINT' or 'POLYGON', or a named \code{matrix} with 
+#'  precipitation data. See details.   
+#' @param timeseries logical, \code{FALSE} for a single point time series
+#'  observation or \code{TRUE} for a time series based on \var{intervals}
+#' @param as.sf logical, to return an object of class 'sf'
+#' @details 
+#' #' Additional arguments:
+#' 
+#' \code{intervals}: an integer (no lower than 5), for the days intervals when
+#'  \var{timeseries = TRUE}
+#'  
+#' \code{last.day}: optional to \var{span}, an object of class \code{Date} or
+#'  any other object that can be coerced to \code{Date} (e.g. integer, character 
+#'  YYYY-MM-DD)  for the last day of the time series
+#'  
+#' \code{dates}: a character (or Date or numeric) vector for the dates of tmax and tmin
+#'  in the \code{default} method
+#' 
+#' \code{data.from}: character for the source of remote data. Current remote source 
+#'  is: 'nasapower'
+#' 
+#' \code{pars}: character vector for the precipitation data to be fetched. If 
+#'  \code{data.from} is 'nasapower', the default precipitation parameter is "PRECTOT".
+#' 
+#' \code{days.before}: optional, an integer for the number of days before 
+#'  \var{day.one} to be included in the timespan.
+#'  
+#' # S3 Methods 
+#' 
+#' The \code{matrix} method assumes that \var{object} contains climate data available in
+#'  your R section; see help("rain_dat", package = "climatrends") for an example on input 
+#'  structure.
+#' 
+#' The \code{data.frame} and the \code{sf} methods assumes that the climate data
+#'  will e fetched from a remote (cloud) source that be adjusted using the argument 
+#'  \var{data.from}.
+#'
+#' When \var{timeseries} = \code{TRUE}, an id is created, 
+#'  which is the index for the rownames of the inputted \var{object}.
+#'
 #' @return A dataframe with rainfall indices:
 #' \item{MLDS}{maximum length of consecutive dry day, rain < 1 mm (days)}
 #' \item{MLWS}{maximum length of consecutive wet days, rain >= 1 mm (days)}
@@ -22,83 +59,229 @@
 #' \item{SDII}{simple daily intensity index, total precipitation divided by the
 #'  number of wet days (mm/days)}
 #'  
-#'  When \var{timeseries} = \code{TRUE}, an id is created, 
-#'  which is the index for the rownames of the provided \var{object}.
-#'  
-#' @family climatology functions
 #' @references 
 #' Aguilar E., et al. (2005). Journal of Geophysical Research, 
 #' 110(D23), D23107. \cr\url{https://doi.org/10.1029/2005JD006119}
 #' 
-#' Sparks A. H. (2018). Journal of Open Source Software, 3(30), 1035. 
-#' \cr\url{https://doi.org/10.21105/joss.01035}
-#' 
 #' @examples
-#' # Using local sources
-#' data("chirp", package = "climatrends")
+#' # A vector with precipitation data
+#' set.seed(987219)
+#' rain <- runif(50, min = 0, max = 6)
 #' 
-#' day <- as.Date("2013-10-28", format = "%Y-%m-%d")
+#' rainfall(rain)
 #' 
-#' rainfall(chirp,
-#'          day.one = day,
-#'          span = 11)
+#' # Return as timeseries with intervals of 7 days
+#' dates <- 17650:17699
+#' rainfall(rain, dates = dates, timeseries = TRUE, intervals = 7)
 #' 
+#' ######################################################
+#' 
+#' # the matrix method
+#' data("rain_dat", package = "climatrends")
+#' 
+#' rainfall(rain_dat,
+#'          day.one = "2013-10-28",
+#'          span = 12)
+#' 
+#' #####################################################
 #' \donttest{
-#' # Using NASA POWER
+#' # Using remote sources of climate data
 #' library("nasapower")
+#' data("lonlatsf", package = "climatrends")
 #' 
-#' # random points within bbox(11, 12, 55, 58)
-#' set.seed(123)
-#' lonlat <- data.frame(lon = runif(3, 11, 12),
-#'                      lat = runif(3, 55, 58))
+#' # some random dates provided as integers and coerced to Dates internally
+#' set.seed(2718279)
+#' dates <- as.integer(runif(5, 17660, 17675))
 #' 
-#' # random dates within 2018-05-15 and 2018-05-20
-#' set.seed(321)
-#' dates <- as.integer(runif(3, 17666, 17670))
-#' dates <- as.Date(dates, origin = "1970-01-01")
+#' # get precipitation indices for 30 days after day.one
+#' # return a data.frame
+#' rain1 <- rainfall(lonlatsf,
+#'                   day.one = dates,
+#'                   span = 30,
+#'                   as.sf = FALSE)
+#' rain1
 #' 
-#' # calculate rainfall for the first 50 days after day.one
-#' rainfall(lonlat,
-#'          day.one = dates,
-#'          span = 50)
+#' # get precipitation indices from "2010-12-01" to "2011-01-31"
+#' rain2 <- rainfall(lonlatsf,
+#'                   day.one = "2010-12-01",
+#'                   last.day = "2011-01-31")
+#' rain2
+#' }
 #' 
-#' 
-#' # include the first 15 days before day.one (residual precipitation)
-#' rainfall(lonlat,
-#'          day.one = dates,
-#'          span = 50,
-#'          days.before = 15)
-#' 
-#' # rainfall indices over a time series          
-#' rainfall(lonlat,
-#'          day.one = dates,
-#'          span = 50,
-#'          timeseries = TRUE,
-#'          intervals = 7)
-#' }       
-#'          
-#' @importFrom tibble as_tibble
 #' @importFrom stats quantile
 #' @export
-rainfall <- function(object, day.one = NULL, 
-                     span = 150, timeseries = FALSE,
-                     intervals = 5,
-                     ...)
+rainfall <- function(object, ...)
 {
+  UseMethod("rainfall")
+}
+#' @rdname rainfall
+#' @method rainfall default
+#' @export
+rainfall.default <- function(object, ..., timeseries = FALSE){
+  
+  dots <- list(...)
+  dates <- dots[["dates"]]
+  intervals <- dots[["intervals"]]
+  
+  if (!is.null(dates)) {
+    dates <- .coerce2Date(dates)
+  }
+  
+  setnulldate <- FALSE
+  if (is.null(dates)) {
+    dates <- .coerce2Date(1:length(object))
+    
+    if (isTRUE(timeseries)) {
+      setnulldate <- TRUE
+    }
+  }
+  
+  rain <- data.frame(id = 1, value = object, date = dates, stringsAsFactors = FALSE)
+  
+  indices <- .rainfall_indices(rain, timeseries, intervals)
+  
+  if (isTRUE(setnulldate)) {
+    message("Intervals set with no visible dates, returning NAs \n")
+    indices$date <- NA 
+  }
+  
+  return(indices)
+  
+}
+
+#' @rdname rainfall
+#' @method rainfall data.frame
+#' @export
+rainfall.data.frame <- function(object, day.one, span = NULL, ...,
+                                timeseries = FALSE){
+  
+  dots <- list(...)
+  pars <- dots[["pars"]]
+  intervals <- dots[["intervals"]]
+  
+  # coerce inputs to data.frame
+  object <- as.data.frame(object)
+  if(dim(object)[[2]] != 2) {
+    stop("Subscript out of bounds. In rainfall.data.frame(),",
+         " only lonlat should be provided. \n")
+  }
+  
+  day.one <- as.data.frame(day.one)[, 1]
+  
+  if (is.null(pars)) {
+    pars <- "PRECTOT"
+  }
+  
+  rain <- get_timeseries(object, day.one, span, pars = pars, ...)[[1]]
+  
+  indices <- .rainfall_indices(rain, timeseries, intervals)
+  
+  return(indices)
+  
+}
+
+#' @rdname rainfall
+#' @method rainfall matrix
+#' @export
+rainfall.matrix <- function(object, day.one, span = NULL, ...,
+                            timeseries = FALSE){
+  dots <- list(...)
+  intervals <- dots[["intervals"]]
+  days.before <- dots[["days.before"]]
+  
+  # coerce to data.frame
+  day.one <- as.data.frame(day.one)[, 1]
+  
+  rain <- get_timeseries(object, day.one, span = span, 
+                         days.before = days.before)[[1]]
+  
+  indices <- .rainfall_indices(rain, timeseries, intervals)
+  
+  return(indices)
+  
+}
+
+
+#' @rdname rainfall
+#' @method rainfall sf
+#' @export
+rainfall.sf <- function(object, day.one, span = NULL, ...,
+                        timeseries = FALSE, as.sf = TRUE){
+  
+  dots <- list(...)
+  pars <- dots[["pars"]]
+  intervals <- dots[["intervals"]]
+  
+  day.one <- as.data.frame(day.one)[, 1]
+  
+  if (is.null(pars)) {
+    pars <- "PRECTOT"
+  }
+  
+  rain <- get_timeseries(object, day.one, span, pars = pars, ...)[[1]]
+  
+  indices <- .rainfall_indices(rain, timeseries, intervals)
+  
+  if (all(as.sf, timeseries)) {
+    
+    xy <- .lonlat_from_sf(object)
+    xy <- as.data.frame(xy)
+    xy$id <- 1:dim(xy)[[1]]
+    xy <- merge(xy, indices, by = "id")
+    
+    indices <- sf::st_as_sf(xy, coords = c("lon", "lat"), crs = 4326)
+    
+  }
+  
+  if (isTRUE(as.sf) & isFALSE(timeseries)) {
+    
+    indices <- suppressWarnings(sf::st_bind_cols(object, indices))
+    
+  }
+  
+  if (isFALSE(as.sf) & isTRUE(timeseries)) {
+    
+    xy <- .lonlat_from_sf(object)
+    xy <- as.data.frame(xy)
+    xy$id <- 1:dim(xy)[[1]]
+    indices <- merge(xy, indices, by = "id", all.y = TRUE)
+    
+    class(indices) <- union("clima_df", class(indices))
+    
+  }
+  
+  return(indices)
+  
+}
+
+#' Rainfall indices
+#' 
+#' This is the main function, the others are handling methods
+#' 
+#' @param rain data.frame with following values id, value and date
+#' @param timeseries if indices are to be returned in timeseries 
+#' @param intervals the intervals in the timeseries
+#' @examples
+#' r <- data.frame(id = 1, 
+#'                 value = runif(21, 0, 4), 
+#'                 date = 200:220, 
+#'                 stringsAsFactors = FALSE)
+#' 
+#' .rainfall_indices(r)
+#' 
+#' @noRd 
+.rainfall_indices <- function(rain, timeseries = FALSE, intervals = NULL){
   
   index <- c("MLDS","MLWS","R10mm","R20mm","Rx1day",
              "Rx5day","R95p","R99p","Rtotal","SDII")
   
-  # get timespan
-  if (dim(object)[2] == 2) {
-    r <- .get_timeseries(object, day.one, span, pars = "PRECTOT", ...)
-  } else {
-    r <- .get_timeseries(object, day.one, span, ...)
-  }
+  nr <- max(unique(rain$id))
   
-  n <- nrow(r)
-  
-  if (timeseries) {
+  if (isTRUE(timeseries)) {
+    
+    ids <- unique(rain$id)
+    
+    rain <- split(rain, rain$id)
     
     # it might happen that when bins are not well distributed across dates
     # in that case the last values are dropped
@@ -106,66 +289,53 @@ rainfall <- function(object, day.one = NULL,
     # in that case, the last four observations are dropped to fit in a vector of
     # length == 49 (the maximum integer from dividing days/intervals)
     # organise bins, ids and dates
-    bins <- floor(ncol(r) / intervals)
-    
-    bins <- rep(1:bins, each = intervals, length.out = NA)
-    
-    # ids are the row names in r
-    ids <- rownames(r)
-    
-    # dates are the first day for each bin
-    dates <- NULL
-    # for diffent day.one a loop is required to take the
-    # sequence of days and the first day in each bin
-    for (i in seq_along(day.one)) {
-
-      d <- day.one[[i]]:(day.one[[i]] + (span - 1))
-
-      d <- d[seq_along(bins)]
+    rain <- lapply(rain, function(x){
       
-      d <- d[!duplicated(bins)]
-
-      d <- rep(d, each = length(index))
-
-      dates <- c(dates, d)
-
-
-    }
-
-    dates <- as.Date(dates, origin = "1970-01-01")
+      r <- dim(x)[[1]]
+      
+      bins <- floor(r / intervals)
+      
+      bins <- rep(1:bins, each = intervals, length.out = NA)
+      
+      x <- x[1:length(bins), ]
+      
+      x$id <- paste(x$id, bins, sep = "_")
+      
+      x 
+      
+    })
     
-    # transpose and keep values until the end of bins
-    rr <- t(r)
+    rain <- do.call("rbind", rain)
     
-    # keep data within the lenght of bins
-    rr <- as.data.frame(rr[seq_along(bins), ])
-    
-    # split by ids
-    rr <- split(rr, bins)
+    rain <- split(rain, rain$id)
     
     # calculate indices
-    ind <- lapply(rr, function(x) {
+    ind <- lapply(rain, function(x) {
       
-      x <- apply(x, 2, function(y) {
-        
-        c(.dryspell(y),
-          .wetspell(y),
-          .r_ten_mm(y),
-          .r_twenty_mm(y),
-          .r_one_day(y),
-          .r_five_day(y),
-          .very_wet_days(y),
-          .extrem_wet_days(y),
-          .r_total(y),
-          .sdii(y))
-        
-      })
+      id <- strsplit(x$id[1], "_")[[1]][[1]]
       
-      x <- data.frame(id    = rep(ids, each = length(index)),
-                      index = rep(index, n), 
-                      value = as.vector(x))  
+      d <- x$date[[1]]
       
-      })
+      y <- x$value
+      
+      i <- c(.dryspell(y),
+             .wetspell(y),
+             .r_ten_mm(y),
+             .r_twenty_mm(y),
+             .r_one_day(y),
+             .r_five_day(y),
+             .very_wet_days(y),
+             .extrem_wet_days(y),
+             .r_total(y),
+             .sdii(y))
+      
+      i <- data.frame(id    = id,
+                      date  = as.character(d),
+                      index = index,
+                      value = i, 
+                      stringsAsFactors = FALSE)
+      
+    })
     
     ind <- do.call("rbind", ind)
     
@@ -173,25 +343,27 @@ rainfall <- function(object, day.one = NULL,
     
     ind$index <- as.character(ind$index)
     
+    ind$date <- .coerce2Date(ind$date)
+    
     ind <- ind[order(ind$id), ]
     
-    ind$date <- dates
+    ind <- as.data.frame(ind, stringsAsFactors = FALSE)
+    
+    rownames(ind) <- seq_along(ind[, 1])
     
     ind <- ind[, c("id", "date", "index", "value")]
-    
     
   } 
   
   # if no time series required then
-  if (!timeseries) {
+  if (isFALSE(timeseries)) {
     
-    nr <- dim(r)[[1]]
     # split r by rows
-    r <- split(r, seq_len(nr))
+    r <- split(rain, rain$id)
     
     ind <- lapply(r, function(x) {
       
-      x <- as.vector(as.matrix(x))
+      x <- x$value
       
       x <- data.frame(.dryspell(x),
                       .wetspell(x),
@@ -202,7 +374,8 @@ rainfall <- function(object, day.one = NULL,
                       .very_wet_days(x),
                       .extrem_wet_days(x),
                       .r_total(x),
-                      .sdii(x))
+                      .sdii(x),
+                      stringsAsFactors = FALSE)
       
     })
     
@@ -210,17 +383,25 @@ rainfall <- function(object, day.one = NULL,
     ind <- do.call("rbind", ind)
     
     names(ind) <- index
+   
+    ind <- as.data.frame(ind, stringAsFactor = FALSE)
+    
+    integ <- c("MLDS","MLWS","R10mm","R20mm")
+    
+    ind[integ] <- lapply(ind[integ] , as.integer)
+    
+    rownames(ind) <- seq_along(ind[, 1])
     
   }
   
-  ind <- tibble::as_tibble(ind)
+  class(ind) <- union("clima_df", class(ind))
   
   return(ind)
+  
 }
 
-
 #' Maximum length of consecutive dry days
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the MLDS index, which is the maximum length of consecutive dry days
 #' precipitation < 1 mm
 #' @examples
@@ -229,14 +410,19 @@ rainfall <- function(object, day.one = NULL,
 #' r[c(1,4,9:12,17)] <- 0
 #' chirps:::.dryspell(r)
 #' @noRd
-.dryspell <- function(object)
-{
+.dryspell <- function(x){
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
   # the function rle is applied
   # which looks for the sequencies of numbers
   # in this case, zeros (0)
   # take the maximum sequency
   # first all values < 1 are converted to zero (0)
-  ds <- ifelse(object < 1, 0, object)
+  ds <- x[!is.na(x)]
+  
+  ds <- ifelse(ds < 1, 0, ds)
   
   # get the lengths of each sequency of zeros (0)
   keep <- rle(ds)$values
@@ -261,7 +447,7 @@ rainfall <- function(object, day.one = NULL,
 }
 
 #' Maximum length of consecutive wet days
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the MLWS index, which is the maximum length of consecutive wet days
 #' precipitation > 1 mm
 #' @examples
@@ -270,14 +456,20 @@ rainfall <- function(object, day.one = NULL,
 #' r[c(1,4,9:11)] <- 0.1
 #' chirps:::.wetspell(r)
 #' @noRd
-.wetspell <- function(object)
-{
+.wetspell <- function(x){
+  
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
   # the function rle is applied
   # which looks for the sequencies of zeros
   # take the maximum sequency
   # first all values >= 1 are converted to zero (0)
   # no precipitation (r < 1) is converted to two (2)
-  ws <- ifelse(object >= 1, 0, 2)
+  ws <- x[!is.na(x)]
+  
+  ws <- ifelse(ws >= 1, 0, 2)
   
   # get the lengths of each sequency of zeros (0)
   keep <- rle(ws)$values
@@ -299,7 +491,7 @@ rainfall <- function(object, day.one = NULL,
 }
 
 #' Heavy precipitation days (10 >= r < 20 mm)
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the R10mm index, which is number of heavy precipitation days (10 >= r
 #'  < 20 mm)
 #' @examples
@@ -308,16 +500,20 @@ rainfall <- function(object, day.one = NULL,
 #' r[c(1,4,9:11)] <- 0.1
 #' chirps:::.r_ten_mm(r)
 #' @noRd
-.r_ten_mm <- function(object) {
+.r_ten_mm <- function(x) {
   
-  rt <- sum(object >= 10 & object < 20, na.rm = TRUE)
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
+  rt <- sum(x >= 10 & x < 20, na.rm = TRUE)
   
   return(rt)
   
 }
 
 #' Very heavy precipitation days (r >= 20)
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the R20mm index, which is number of very heavy precipitation days (r
 #'  >= 20)
 #' @examples
@@ -326,16 +522,20 @@ rainfall <- function(object, day.one = NULL,
 #' r[c(1,4,9:11)] <- 0.1
 #' chirps:::.r_twenty_mm(r)
 #' @noRd
-.r_twenty_mm <- function(object) {
+.r_twenty_mm <- function(x) {
   
-  rtw <- sum(object >= 20, na.rm = TRUE)
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
+  rtw <- sum(x >= 20, na.rm = TRUE)
   
   return(rtw)
   
 }
 
 #' Simple rainfall intensity index
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the SDII index, which is the simple daily intensity 
 #' index total precipitation divided by the number of wet days (r >= 1.0mm)
 #' @examples
@@ -348,13 +548,17 @@ rainfall <- function(object, day.one = NULL,
 #'
 #' chirps:::.sdii(rep(0.1, 9))
 #' @noRd
-.sdii <- function(object) {
+.sdii <- function(x){
+  
+  if (all(is.na(x))) {
+    return(NA)
+  }
   
   # total precipitation
-  tp <- sum(object, na.rm = TRUE)
+  tp <- sum(x, na.rm = TRUE)
   
   # number of wet days
-  wd <- length(object[object >= 1])
+  wd <- length(x[x >= 1])
   
   #if both zero, then return 0
   if (wd == 0) {
@@ -368,7 +572,7 @@ rainfall <- function(object, day.one = NULL,
 }
 
 #' Compute Rx5day rainfall index
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the Rx5day index, which is the maximun sum 
 #' of rain in consecutive 5 days
 #' @examples
@@ -377,17 +581,27 @@ rainfall <- function(object, day.one = NULL,
 #' r[c(1,4,9:12,17)] <- 0
 #' chirps:::.r_five_day(r)
 #' @noRd
-.r_five_day <- function(object)
-{
+.r_five_day <- function(x){
+  
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
   # this look for the maximum sum of rain in
   # consecutive 5 days
-  l <- length(object)
+  l <- length(x)
+  
+  if (l < 5) {
+    
+    return(0L)
+  
+  }
   
   r5day <- NULL
   
   for (i in 1:(l-4)){
     
-    r5day <- cbind(r5day, sum(object[i:(i + 4)], na.rm = TRUE))
+    r5day <- cbind(r5day, sum(x[i:(i + 4)], na.rm = TRUE))
     
   }
   
@@ -398,7 +612,7 @@ rainfall <- function(object, day.one = NULL,
 }
 
 #' Maximum 1-day rainfall
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the Rx1day index, which is the 1-day rainfall
 #' @examples
 #' set.seed(12)
@@ -406,16 +620,20 @@ rainfall <- function(object, day.one = NULL,
 #' r[c(1,4,9:12,17)] <- 0
 #' chirps:::.r_one_day(r)
 #' @noRd
-.r_one_day <- function(object) {
+.r_one_day <- function(x) {
   
-  ro <- max(object, na.rm = TRUE)
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
+  ro <- max(x, na.rm = TRUE)
   
   return(ro)
   
 }
 
 #' Total rainfall (mm) in wet days (r >= 1)
-#' @param object numeric vector
+#' @param x numeric vector
 #' @return the Rtotal index, which is sum of rainfall (mm) in wet days (r >= 1)
 #' @examples
 #' set.seed(12)
@@ -423,11 +641,15 @@ rainfall <- function(object, day.one = NULL,
 #' r[c(1,4,9:12,17)] <- 0
 #' chirps:::.r_total(r)
 #' @noRd
-.r_total <- function(object) {
+.r_total <- function(x) {
   
-  rt <- object[object >= 1]
+  if (all(is.na(x))) {
+    return(NA)
+  }
   
-  rt <- sum(object, na.rm = TRUE)
+  rt <- x[x >= 1]
+  
+  rt <- sum(rt, na.rm = TRUE)
   
   return(rt)
   
@@ -435,20 +657,24 @@ rainfall <- function(object, day.one = NULL,
 
 
 #' Very wet days
-#' @param object numeric vector
-#' @return the R95p index, annual total PRCP when rain > 95th percentile
+#' @param x numeric vector
+#' @return the R95p index, total PRCP when rain > 95th percentile
 #' @examples
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
 #' chirps:::.very_wet_days(r)
 #' @noRd
-.very_wet_days <- function(object) {
+.very_wet_days <- function(x) {
   
-  q <- stats::quantile(object, probs = seq(0, 1, 0.05), na.rm = TRUE)
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
+  q <- stats::quantile(x, probs = seq(0, 1, 0.05), na.rm = TRUE)
   q <- q["95%"]
   
-  vwd <- object[object > q]
+  vwd <- x[x > q]
   
   vwd <- sum(vwd, na.rm = TRUE)
   
@@ -456,21 +682,25 @@ rainfall <- function(object, day.one = NULL,
   
 }
 
-#' Very wet days
-#' @param object numeric vector
-#' @return the R95p index, annual total PRCP when rain > 95th percentile
+#' Extrem wet days
+#' @param x numeric vector
+#' @return the R99p index, total PRCP when rain > 99th percentile
 #' @examples
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
 #' chirps:::.extrem_wet_days(r)
 #' @noRd
-.extrem_wet_days <- function(object) {
+.extrem_wet_days <- function(x){
   
-  q <- stats::quantile(object, probs = seq(0, 1, 0.01), na.rm = TRUE)
+  if (all(is.na(x))) {
+    return(NA)
+  }
+  
+  q <- stats::quantile(x, probs = seq(0, 1, 0.01), na.rm = TRUE)
   q <- q["99%"]
   
-  vwd <- object[object > q]
+  vwd <- x[x > q]
   
   vwd <- sum(vwd, na.rm = TRUE)
   

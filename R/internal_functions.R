@@ -1,13 +1,14 @@
-#' Is a tibble object
+#' Is a Date object
 #' @param object an object to have its class tested
 #' @return a logical value where TRUE indicates that the 
-#' object is of class "tbl_df"
+#' object is of class "Date"
 #' @examples
-#' .is_tibble(airquality)
+#' x <- as.Date(c(1000, 2000), origin = "1970-01-01")
+#' .is_Date(x)
 #' @noRd
-.is_tibble <- function(object) {
+.is_Date <- function(object) {
   
-  c("tbl_df") %in% class(object)
+  c("Date") %in% class(object)
 
 }
 
@@ -57,5 +58,117 @@
   index_xy <- which.min(xy)
   
   return(index_xy)
+  
+}
+
+#' Get lonlat from a sf object
+#' 
+#' @param object an object of class sf and geometry "POINT" or "POLYGON"
+#' @return a matrix with longitude and latitude and that order
+#'  for sf "POLYGON" a centroid within the polygon is returned
+#' @examples 
+#' library("sf")
+#' set.seed(123)
+#' lonlat <- data.frame(lon = runif(2, 11, 12),
+#'                      lat = runif(2, 55, 58))
+#' lonlat <- st_as_sf(lonlat, coords = c("lon","lat"))
+#' 
+#' .lonlat_from_sf(lonlat)
+#' 
+#' @importFrom sf st_geometry_type st_centroid
+#' @noRd
+.lonlat_from_sf <- function(object){
+  # check geometry type
+  type <- c("POINT", "POLYGON")
+  
+  # check for supported types 
+  supp_type <- c(all(grepl(type[[1]], sf::st_geometry_type(object))),
+                 all(grepl(type[[2]], sf::st_geometry_type(object))))
+  
+  if (!any(supp_type)) {
+    stop("The sf geometry type is not supported. ",
+         "Please provide a sf object of geometry type ",
+         "'POINT' or 'POLYGON'\n")
+  }
+  
+  type <- type[which(supp_type)]
+  
+  nr <- dim(object)[[1]]
+  
+  # find the sf_column
+  index <- attr(object, "sf_column")
+  
+  # get the sf column
+  lonlat <- object[[index]]
+  
+  if (type == "POINT") {
+    
+    # unlist the sf_column
+    lonlat <- unlist(object[[index]])
+    
+  }
+  
+  if (type == "POLYGON") {
+    
+    # set centroid to validade lonlat
+    lonlat <- sf::st_centroid(lonlat)
+    
+    # unlist the sf_column
+    lonlat <- unlist(lonlat)
+    
+  }
+  
+  lonlat <- matrix(lonlat,
+                   nrow = nr,
+                   ncol = 2, 
+                   byrow = TRUE, 
+                   dimnames = list(seq_len(nr), c("lon","lat")))
+  
+  return(lonlat)
+}
+
+
+#' Coerce to 'Date'
+#' Coerce a vector of characters or integers into class 'Date'
+#' @param x a vector
+#' @examples 
+#' # valid entries
+#' .coerce2Date(c(819, 9811))
+#' 
+#' .coerce2Date(c("1970-01-01", "2020-09-01"))
+#' 
+#' .coerce2Date(as.Date(12, origin = "1970-01-01"))
+#' 
+#' # some errors
+#' .coerce2Date(letters[1:10])
+#' 
+#' .coerce2Date(c("1970-01-01", "2020-90-01"))
+#' 
+#' @noRd
+.coerce2Date <- function(x) {
+  
+  if (is.character(x)) {
+      
+      x <- as.Date(x, format = "%Y-%m-%d")
+
+  }
+  
+  if (any(is.integer(x), is.numeric(x))) {
+    
+    x <- as.Date(x, origin = "1970-01-01")
+  
+  }
+  
+  if (isFALSE(.is_Date(x))) {
+      stop("No visible method to coerce",
+           " given dates to as.Date \n")
+  }
+  
+  if (any(is.na(x))) {
+    stop("Visible method to coerce given",
+         " dates to as.Date returning NAs \n")
+  }
+  
+  return(x)
   
 }

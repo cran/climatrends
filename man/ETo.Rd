@@ -2,82 +2,123 @@
 % Please edit documentation in R/ETo.R
 \name{ETo}
 \alias{ETo}
-\title{Evapotranspiration}
+\alias{ETo.default}
+\alias{ETo.data.frame}
+\alias{ETo.array}
+\alias{ETo.sf}
+\title{Reference evapotranspiration}
 \usage{
-ETo(object, day.one = NULL, span = 150, lat = NULL, Kc = 1, p = NULL)
+ETo(object, ..., Kc = 1)
+
+\method{ETo}{default}(object, tmin, ..., Kc = 1, lat = NULL, month = NULL)
+
+\method{ETo}{data.frame}(object, day.one, ..., Kc = 1)
+
+\method{ETo}{array}(object, day.one, ..., Kc = 1, lat = NULL, p = 0.27)
+
+\method{ETo}{sf}(object, day.one, ..., Kc = 1, as.sf = TRUE)
 }
 \arguments{
-\item{object}{a numeric vector of geographic coordinates (lonlat) or
-an array with two dimensions containing the temperature data;
-1st dimension contains the day temperature and 2nd dimension the night
-temperature. When lonlat is used, the function makes a call to
-\code{nasapower::get_power()} to fetch and concatenate environmental
-data from NASA POWER (\url{https://power.larc.nasa.gov/}) for the parameters
-T2M_MAX (Maximum Temperature at 2 m) and 
-T2M_MIN (Minimum Temperature at 2 m)}
+\item{object}{a numeric vector with the maximum temperature, 
+or a data.frame with geographical coordinates (lonlat), 
+or an object of class \code{sf} with geometry 'POINT' or 'POLYGON', 
+or an \code{array} with two dimensions containing the
+maximum and minimum temperature, in that order. See details}
 
-\item{day.one}{a vector of class \code{Date} for the starting date to 
-capture the environmental data (YYYY-MM-DD)}
-
-\item{span}{an integer or a vector with integers for the duration 
-of the timespan to be captured}
-
-\item{lat}{a vector for the latitude (in Decimal degrees) 
-used to compute mean daily percentage of annual daytime hours based 
-on the latitude and month. See details}
+\item{...}{additional arguments passed to methods. See details}
 
 \item{Kc}{a numeric value for the crop factor for water requirement}
 
-\item{p}{optional, a numeric value (from 0 to 1) used if lat is not 
-given, representing the mean daily percentage of annual daytime hours 
-for different latitudes}
+\item{tmin}{a numeric vector with the minimum temperature}
+
+\item{lat}{a vector for the latitude (in Decimal degrees), used to compute 
+mean daily percentage of annual daytime hours based on the latitude and month.
+This is extracted automatically in the \code{sf} method. See details}
+
+\item{month}{an integer for the reference month of daylight percentage}
+
+\item{day.one}{a vector of class \code{Date} or any other object that can be 
+coerced to \code{Date} (e.g. integer, character YYYY-MM-DD) for the starting 
+day to capture the climate data}
+
+\item{p}{optional if \var{lat} is given, a numeric for the mean daily percentage 
+of annual daytime hours (p = 0.27 by default)}
+
+\item{as.sf}{logical, to return an object of class 'sf'}
 }
 \value{
 The evapotranspiration in mm/day
 }
 \description{
-Compute evapotranspiration using the Blaney-Criddle method. A 
+Reference evapotranspiration using the Blaney-Criddle method. This is general  
 theoretical method used when no measured data on pan evaporation 
-are available locally.
+is available locally.
 }
 \details{
-When \var{lat} is used, it is combined with the month provided in 
+When \var{lat} is provided, it is combined with the month provided in 
  \var{day.one} to call for the system data \code{daylight} to find
  the correct value for \var{p} which represents the daily percentage
- of daytime hours in the given month and latitude.
+ of daytime hours in the given month and latitude. Otherwise \var{p} is set 
+ to 0.27 as default.
+ 
+The \code{array} method assumes that \var{object} contains climate data available 
+ in your R section; this requires an array with two dimensions, 1st dimension 
+ contains the day temperature and 2nd dimension the night temperature, 
+ see help("temp_dat", package = "climatrends") for an example on input structure.
+
+The \code{data.frame} method and the \code{sf} method assumes that the climate data
+ will be fetched from a remote (cloud) source that be adjusted using the argument 
+ \var{data.from}.
+
+Additional arguments:
+
+\code{last.day}: an object (optional to \var{span}) of class \code{Date} or
+ any other object that can be coerced to \code{Date} (e.g. integer, character 
+ YYYY-MM-DD) for the last day of the time series
+ 
+\code{span}: an integer (optional to \var{last.day}) or a vector with 
+ integers (optional if \var{last.day} is given) for the length of 
+ the time series to be captured
+
+\code{data.from}: character for the source of climate data. Current remote data 
+ is: 'nasapower'
+
+\code{pars}: character vector for the temperature data to be fetched. If 
+ \code{data.from} is 'nasapower'. The temperature can be adjusted to 2 m, the default,
+ c("T2M_MAX", "T2M_MIN") or 10 m c("T10M_MAX", "T10M_MIN") 
+
+\code{days.before}: optional, an integer for the number of days before 
+ \var{day.one} to be included in the timespan.
 }
 \examples{
-# Using local sources
-data("modis", package = "climatrends")
+# the default method
+set.seed(78)
+tmax <- runif(50, 37, 47)
+set.seed(79)
+tmin <- runif(50, 31, 34)
 
-day <- as.Date("2013-10-28", format = "\%Y-\%m-\%d")
+ETo(tmax, tmin, lat = 22, month = 10)
 
-ETo(modis, 
-    day.one = day,
+###############################################
+
+# the array method
+data("temp_dat", package = "climatrends")
+
+ETo(temp_dat, 
+    day.one = "2013-10-28",
     span = 10,
     Kc = 0.92)
     
 \donttest{
-# Using remote sources 
+#######################################
 library("nasapower")
+data("lonlatsf", package = "climatrends")
 
-# random geographic locations around bbox(11, 12, 55, 58)
-set.seed(123)
-lonlat <- data.frame(lon = runif(2, 11, 12),
-                     lat = runif(2, 55, 58))
-
-# random dates around 2018-05-15 and 2018-05-20
-set.seed(321)
-dates <- as.integer(runif(2, 17666, 17670))
-dates <- as.Date(dates, origin = "1970-01-01")
-
-# the evapotranspiration in the first 50 days after day.one
-ETo(lonlat,
-    day.one = dates,
-    span = 50,
-    lat = lonlat[["lat"]])
+ETo(lonlatsf,
+    day.one = "2015-04-22",
+    last.day = "2015-06-22",
+    pars = c("T10M_MAX", "T10M_MIN"))
 }
-
 }
 \references{
 Brouwer C. & Heibloem M. (1986). Irrigation water management: 
@@ -86,9 +127,9 @@ United Nations, Rome, Italy.
 \url{http://www.fao.org/3/S2022E/s2022e00.htm}
 }
 \seealso{
-Other climatology functions: 
+Other temperature functions: 
 \code{\link{GDD}()},
-\code{\link{rainfall}()},
+\code{\link{crop_sensitive}()},
 \code{\link{temperature}()}
 }
-\concept{climatology functions}
+\concept{temperature functions}

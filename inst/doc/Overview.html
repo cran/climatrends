@@ -11,7 +11,7 @@
 
 
 
-<title>climatrends: Precipitation and Temperature Indices for Climate Variability Analysis</title>
+<title>climatrends: Climate Variability Indices for Ecological Modelling</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -374,282 +374,160 @@ summary {
 
 
 
-<h1 class="title toc-ignore">climatrends: Precipitation and Temperature Indices for Climate Variability Analysis</h1>
+<h1 class="title toc-ignore">climatrends: Climate Variability Indices for Ecological Modelling</h1>
 <h4 class="author">Kauê de Sousa</h4>
 <address class="author_afil">
-Department of Agricultural Sciences, Inland Norway University, Hamar, Norway; and The Alliance of Bioversity International and CIAT, Rome, Italy<br><h4 class="author">Jacob van Etten</h4>
+Department of Agricultural Sciences, Inland Norway University, Hamar, Norway; and Bioversity International, Rome, Italy<br><h4 class="author">Jacob van Etten</h4>
 <address class="author_afil">
-The Alliance of Bioversity International and CIAT, Rome, Italy<br><h4 class="author">Svein Ø. Solberg</h4>
+Bioversity International, Rome, Italy<br><h4 class="author">Svein Ø. Solberg</h4>
 <address class="author_afil">
 Department of Agricultural Sciences, Inland Norway University, Hamar, Norway<br>
 </div>
 
 
-<p><img align="right" src="data:image/png;base64,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"></p>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<p>Understanding how climate variability influences ecological processes is a key approach to provide recommendations for climate adaptation and biodiversity conservation. <strong>climatrends</strong> aims to provide the toolkit to compute extreme precipitation and temperature indices that serves as input for climate models, crop modelling, trends in climate change and ecology. The climate variables available in <strong>climatrends</strong> were previously used to identify climate patterns in crop growing cycles<span class="citation"><sup>1</sup></span>, regional climate change assessment<span class="citation"><sup>2</sup></span>, crowdsourcing citizen science in agriculture<span class="citation"><sup>3</sup></span> and comparison between perceptions to climate change and satellite observations<span class="citation"><sup>4</sup></span>.</p>
-</div>
-<div id="source-of-data" class="section level1">
-<h1>Source of data</h1>
-<p>By default <strong>climatrends</strong> uses <a href="https://power.larc.nasa.gov/">NASA POWER</a> to compute the indices via the R package <a href="https://CRAN.R-project.org/package=nasapower">nasapower</a><span class="citation"><sup>5</sup></span>. By providing the target dates and the geographic information, <strong>climatrends</strong> sends an internal call to <em>nasapower</em> to request the time series data and compute the environmental indices. This process do not requires much computer capacity but requires a persistent internet connection. NASA POWER, however, has a low grid resolution (0.5 arc-degree) and could not provide the expected results for ecological interactions in a narrow geographical range.</p>
-<p>Other option relies in providing the climate data locally as a <code>matrix</code> or <code>array</code> (please see details below), using, for example, the function <code>extract()</code> from the package <a href="https://CRAN.R-project.org/package=raster">raster</a><span class="citation"><sup>6</sup></span>. The environmental data can be computed using inputted data from CHIRPS<span class="citation"><sup>7</sup></span> for rainfall, and MODIS<span class="citation"><sup>8</sup></span> for land surface temperature. These databases are free and publicly available sources of global coverage with high resolution (0.05 arc-degree), but may require significant local storage capacity. MODIS data also requires some work to reduce noise and gap filling.</p>
+<p>Understanding how climate variability influences ecological processes is a key approach to provide recommendations for climate adaptation and biodiversity conservation. <strong>climatrends</strong> provides methods to compute precipitation and temperature indices that serves as input for crop modelling, ecological modelling and trends in climate change. The climate variables available in <strong>climatrends</strong> were previously used to identify climate patterns in crop growing cycles<span class="citation"><sup>1</sup></span>, regional climate change assessment<span class="citation"><sup>2–5</sup></span>, crowdsourcing citizen science in agriculture<span class="citation"><sup>6</sup></span> and trends in climate change compared with farmers’ perceptions<span class="citation"><sup>7</sup></span>.</p>
 </div>
 <div id="usage" class="section level1">
 <h1>Usage</h1>
+<p>By default, the functions in <strong>climatrends</strong> requires a vector with climate data, and optionally a vector of dates that can be linked to the data for time series analysis. The package also provides methods for objects of classes <code>array</code> (or <code>matrix</code>), <code>sf</code> and <code>data.frame</code>, where the last two are designed to be used to request remote data from <code>R</code> packages that uses API clients, such as nasapower<span class="citation"><sup>8</sup></span>. This vignette presents the main functions and the methods available in <strong>climatrends</strong>. Overall, these applications can be generalised to all functions.</p>
 <div id="temperature" class="section level2">
 <h2>Temperature</h2>
-<p>The function <code>temperature()</code> has as the basic input data an <code>object</code> of class <code>data.frame</code> with geographic information (lonlat) or an <code>array</code> with day and night temperature (when provided locally) and a vector of class <code>Date</code> for the first day that will be taken into account for the indices. The duration from where the environmental indices will be computed is defined by the argument <code>span</code> which can be a single integer that takes into account a single timespan for all tricot experiments or a vector indicating the timespan for each point.</p>
-<p>Here we generate some random points within the Innlandet county in Norway from May-2015:</p>
-<pre class="r"><code>set.seed(6)
-lonlat &lt;- data.frame(lon = runif(5, 8.3, 12),
-                     lat = runif(5, 60, 62.3))
+<p>Here we compute temperature indices for the first semester of 2019 in the Innlandet county in Norway:</p>
+<pre class="r"><code>library(&quot;climatrends&quot;)
 
-date &lt;- as.Date(&quot;2015-05-01&quot;, format = &quot;%Y-%m-%d&quot;)
+data(&quot;innlandet&quot;, package = &quot;climatrends&quot;)
 
-temp &lt;- temperature(lonlat, day.one = date, span = 50)
+temp1 &lt;- temperature(innlandet$tmax, innlandet$tmin)
 
-head(temp)
-#&gt; # A tibble: 5 x 8
-#&gt;   maxDT  minDT maxNT  minNT   DTR    SU    TR   CFD
-#&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1  12.8 -0.580  3.61 -10.8   7.36     0     0    13
-#&gt; 2  13.4  0.66   3.84  -7.6   7.02     0     0    12
-#&gt; 3  10.7 -1.48   2.43 -11.3   7.12     0     0    40
-#&gt; 4  14.1  1.53   3.94  -6.85  8.44     0     0    12
-#&gt; 5  19.6  5.82   8.24  -2.4   8.23     0     0     1</code></pre>
-<p>With the argument <code>timeseries = TRUE</code>, <code>temperature()</code> returns the indices for a time series based on <code>intervals</code>. Here we compute the indices for intervals of 7 days:</p>
-<pre class="r"><code>temp2 &lt;- temperature(lonlat,
-                     day.one = date,
-                     span = 50, 
-                     timeseries = TRUE,
-                     intervals = 7)
+temp1</code></pre>
+<pre><code>##    maxDT  minDT maxNT  minNT   DTR    SU    TR   CFD  WSDI  CSDI   T10p  T90p
+##    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1: 15.13 -14.86  6.77 -19.25     6     0     0   115     4     5 -15.81  9.09</code></pre>
+<p>With the argument <code>timeseries = TRUE</code>, temperature() returns the indices for a time series based on <code>intervals</code>. Here we compute the indices for intervals of 30 days:</p>
+<pre class="r"><code>temp2 &lt;- temperature(innlandet$tmax, innlandet$tmin,
+                     dates = innlandet$dates,
+                     timeseries = TRUE, 
+                     intervals = 30)
 
-head(temp2)
-#&gt; # A tibble: 6 x 4
-#&gt;      id date       index   value
-#&gt;   &lt;int&gt; &lt;date&gt;     &lt;chr&gt;   &lt;dbl&gt;
-#&gt; 1     1 2015-05-01 maxDT   9.7  
-#&gt; 2     1 2015-05-01 minDT  -0.580
-#&gt; 3     1 2015-05-01 maxNT   2.42 
-#&gt; 4     1 2015-05-01 minNT -10.8  
-#&gt; 5     1 2015-05-01 DTR     8.19 
-#&gt; 6     1 2015-05-01 SU      0</code></pre>
+temp2</code></pre>
+<pre><code>##        id       date index  value
+##     &lt;int&gt;     &lt;date&gt; &lt;chr&gt;  &lt;dbl&gt;
+## 1:      1 2019-01-01 maxDT  -0.15
+## 2:      1 2019-01-01 minDT -14.86
+## 3:      1 2019-01-01 maxNT  -3.41
+## 4:      1 2019-01-01 minNT -18.67
+## 5:      1 2019-01-01   DTR   4.35
+## ---                              
+## 68:     1 2019-05-31   CFD   3.00
+## 69:     1 2019-05-31  WSDI   2.00
+## 70:     1 2019-05-31  CSDI   3.00
+## 71:     1 2019-05-31  T10p   0.20
+## 72:     1 2019-05-31  T90p  11.14</code></pre>
 </div>
 <div id="growing-degree-days" class="section level2">
 <h2>Growing degree-days</h2>
-<p>Growing degree-days is a heuristic tool in phenology, it is a measure of heat accumulation used to predict plant and animal development rates<span class="citation"><sup>9</sup></span>. With the function <code>GDD()</code> we can compute the growing degree-days to assess the degree-days required by an certain organism during a certain season. Also, this index can be used as an estimate for the timespan to compute the temperature and precipitation indices. Here we compute the days to reach the growing degree-days for a certain organism which requires 200 degree-days with a <code>base = 5</code> from <code>day.one</code>:</p>
-<pre class="r"><code>gdd &lt;- GDD(lonlat, 
-           day.one = date,
-           degree.days = 200,
-           base = 5)
+<p>Growing degree-days is a heuristic tool in phenology, it is a measure of heat accumulation used to predict plant and animal development rates<span class="citation"><sup>9</sup></span>. With the function <code>GDD()</code> we can compute the growing degree-days over a time series. In this case we apply an adjusted equation designed for cold areas with the argument <code>equation</code>:</p>
+<pre class="r"><code>gdd &lt;- GDD(innlandet$tmax, innlandet$tmin, tbase = 2, equation = &quot;b&quot;)
 
-head(gdd)
-#&gt; # A tibble: 5 x 1
-#&gt;     GDD
-#&gt;   &lt;int&gt;
-#&gt; 1   120
-#&gt; 2   112
-#&gt; 3   150
-#&gt; 4   105
-#&gt; 5    56</code></pre>
-<p>Then, these growing degree-days can be applied as timespan to compute the temperature indices across the season:</p>
-<pre class="r"><code>temp &lt;- temperature(lonlat, 
-                    day.one = date, 
-                    span = gdd)
+gdd</code></pre>
+<pre><code>##         gdd
+##       &lt;dbl&gt;
+## 1:     0.00
+## 2:     0.00
+## 3:     0.00
+## 4:     0.00
+## 5:     0.00
+## ---        
+## 178: 143.04
+## 179: 147.38
+## 180: 153.89
+## 181: 162.18
+## 182: 164.89</code></pre>
+<p>Additionally, the function may return the daily values of degree-days or the number of days that a given organism required to reach a certain number of accumulated degree-days. These values are defined by ‘daily’ or ‘ndays’ and can be adjusted using the argument <code>return.as</code>. The required accumulated gdd is defined with argument <code>degree.days</code>. For example, the Korean pine (<em>Pinus koraiensis</em>) requires 105 <span class="math inline">\(^\circ C\)</span> accumulated gdd to onset of photosynthesis.<span class="citation"><sup>10</sup></span> In that case, the function will calculate the growing degree-days and sum up the values until it reaches the defined gdd (105 <span class="math inline">\(^\circ C\)</span>) and return the number of days needed in the given season, as follows.</p>
+<pre class="r"><code>lonlat &lt;- data.frame(lon = 129.19,
+                     lat = 36.39)
 
-head(temp)
-#&gt; # A tibble: 5 x 8
-#&gt;   maxDT  minDT maxNT  minNT   DTR    SU    TR   CFD
-#&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1  22.3 -0.580  11.4 -10.8   8.05     0     0    13
-#&gt; 2  21.6  0.66   11.8  -7.6   7.43     0     0    12
-#&gt; 3  20.8 -1.48   11.1 -11.3   7.59     0     0    40
-#&gt; 4  22.3  1.53   13.0  -6.85  8.72     0     0    12
-#&gt; 5  19.6  5.82   10.5  -2.4   8.20     0     0     1</code></pre>
+GDD(lonlat, 
+    day.one = &quot;2019-04-01&quot;,
+    last.day = &quot;2019-10-01&quot;,
+    degree.days = 150, 
+    return.as = &quot;ndays&quot;)</code></pre>
+<p>This means that 45 days were required to reach 150 degree-days from April 2019.</p>
+</div>
+<div id="late-spring-frost" class="section level2">
+<h2>Late spring frost</h2>
+<p>Late frost is a freezing event occurring after a substantial accumulation of warmth. These events can be tracked using the function <code>late_frost()</code>. The function returns a data.frame with the duration and gdd accumulated during the <code>events</code> of frost, latency (where there is no frost event, but also there is no GDD), and warming (where GDD is accumulated).</p>
+<pre class="r"><code>lf &lt;- late_frost(innlandet$tmax, 
+                 innlandet$tmin, 
+                 dates = innlandet$date, 
+                 base = 2)
+
+lf</code></pre>
+<pre><code>##        id       date   gdd   event duration
+##     &lt;int&gt;     &lt;date&gt; &lt;dbl&gt;   &lt;fct&gt;    &lt;int&gt;
+## 1:      1 2019-01-01  0.00   frost      108
+## 2:      1 2019-04-19  0.00  latent        1
+## 3:      1 2019-04-20  0.00   frost        1
+## 4:      1 2019-04-21  0.00  latent        2
+## 5:      1 2019-04-23  0.00   frost        2
+## 6:      1 2019-04-25  0.98 warming        6
+## 7:      1 2019-05-01  0.00   frost       14
+## 8:      1 2019-05-15 19.14 warming       11
+## 9:      1 2019-05-26  0.00   frost        6
+## 10:     1 2019-06-01 82.48 warming       31</code></pre>
 </div>
 <div id="rainfall" class="section level2">
 <h2>Rainfall</h2>
-<p>Precipitation indices are computed in the same way as the temperature indices using the function <code>rainfall()</code>. Here we use the NASA POWER data with a timespan defined by the growing degree-days.</p>
-<pre class="r"><code>rain &lt;- rainfall(lonlat, 
-                 day.one = date,
-                 span = gdd)
+<p>Precipitation indices are computed in the same way as the <code>temperature()</code> indices using the function <code>rainfall()</code>. But here, we fetch data from NASA POWER using the <a href="https://CRAN.R-project.org/package=nasapower">nasapower</a> package passed to the <code>data.frame</code> method.</p>
+<pre class="r"><code>library(&quot;nasapower&quot;)
 
-head(rain)
-#&gt; # A tibble: 5 x 10
-#&gt;    MLDS  MLWS R10mm R20mm Rx1day Rx5day  R95p  R99p Rtotal  SDII
-#&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
-#&gt; 1    13    13     8     2   26.8   55.6 107.   50.7   495.  4.23
-#&gt; 2     8    17     7     2   23.0   46.3 104.   44.8   473.  3.81
-#&gt; 3    12    14    10     3   37.0   72.0 169.   63.7   586.  6.04
-#&gt; 4     5     6    12     1   30.6   47.0  99.3  46.8   397.  3.61
-#&gt; 5     6     6     3     0   17.6   41.3  42.4  17.6   187.  1.48</code></pre>
-<p>The function <code>rainfall()</code> also compute indices for a time series:</p>
-<pre class="r"><code>rainfall(lonlat,
-         day.one = date,
-         span = gdd,
-         timeseries = TRUE,
-         intervals = 15)</code></pre>
-<p>Another feature in <code>rainfall()</code> is that it enables the indices to be calculated from some days before <code>day.one</code>. This is important for case studies where a residual precipitation must be taken into account. To do so, we use the argument <code>days.before</code>:</p>
-<pre class="r"><code>rainfall(lonlat,
-         day.one = date,
-         span = gdd,
-         days.before = 15)</code></pre>
+lonlat &lt;- data.frame(lon = c(-73.3, -74.5),
+                     lat = c(-6.1, - 6.2))
+
+rain &lt;- rainfall(lonlat, 
+                 day.one = &quot;2018-11-01&quot;,
+                 last.day = &quot;2018-12-31&quot;)
+
+rain</code></pre>
 </div>
-<div id="evapotranspiration" class="section level2">
-<h2>Evapotranspiration</h2>
-<p>Evapotranspiration can be defined as the sum of evaporation and plant transpiration from the Earth’s surface to the atmosphere. This is also an important index to include in models for ecological interactions. In **climatrends* this index can be calculate using the function <code>ETo()</code> which computes the evapotranspiration based on the Blaney-Criddle method<span class="citation"><sup>10</sup></span>, an ideal equation when only air-temperature data sets are available for a site.</p>
-<pre class="r"><code>eto &lt;- ETo(lonlat, 
-           day.one = date,
-           span = gdd,
-           lat = lonlat[[&quot;lat&quot;]])
+<div id="crop-sensitive-indices" class="section level2">
+<h2>Crop sensitive indices</h2>
+<p>These indices are designed to capture variability in sensitive stages of crop development<span class="citation"><sup>3,4</sup></span> and can be computed using the function <code>crop_sensitive()</code>. Here we use the <code>sf</code> method with 5 random points across the Sinop municipality in Brazil.</p>
+<pre class="r"><code>data(&quot;lonlatsf&quot;, package = &quot;climatrends&quot;)
 
-head(eto)
-#&gt; # A tibble: 5 x 1
-#&gt;     ETo
-#&gt;   &lt;dbl&gt;
-#&gt; 1  4.21
-#&gt; 2  4.24
-#&gt; 3  3.98
-#&gt; 4  4.25
-#&gt; 5  4.54</code></pre>
+crop_sensitive(lonlatsf, 
+               day.one = &quot;2018-12-01&quot;,
+               last.day = &quot;2019-01-31&quot;, 
+               as.sf = FALSE)</code></pre>
+<p>Additionally the thresholds for each index can be adjusted using the argument <code>*.threshold</code> (where * is replaced by the index abbreviation).</p>
 </div>
+<div id="reference-evapotranspiration" class="section level2">
+<h2>Reference evapotranspiration</h2>
+<p>Evapotranspiration can be defined as the sum of evaporation and plant transpiration from the Earth’s surface to the atmosphere. This is also an important index to include in models for ecological interactions. In **climatrends* this index can be calculate using the function <code>ETo()</code> which computes the evapotranspiration based on the Blaney-Criddle method<span class="citation"><sup>11</sup></span>, an ideal equation when only air-temperature data sets are available for a site. Here we use the <code>array</code> method to compute the reference evapotranspiration. And the duration of the timeseries in each row is adjusted with the argument <code>span</code> based on the duration of the anthesis period in the latitude 25N, adjusted with argument <code>lat</code>.</p>
+<pre class="r"><code>data(&quot;temp_dat&quot;, package = &quot;climatrends&quot;)
+
+eto &lt;- ETo(temp_dat, 
+           day.one = &quot;2013-10-28&quot;,
+           span = c(9, 10, 11, 12, 8, 10, 11, 11, 12, 10),
+           lat = rep(25, 10),
+           Kc = 0.92)
+
+eto</code></pre>
+<pre><code>##       ETo
+##     &lt;dbl&gt;
+## 1:   4.21
+## 2:   4.34
+## 3:   4.13
+## 4:   3.50
+## 5:   4.02
+## 6:   3.75
+## 7:   4.02
+## 8:   3.89
+## 9:   3.91
+## 10:  3.65</code></pre>
 </div>
-<div id="compute-indices-from-local-databases" class="section level1">
-<h1>Compute indices from local databases</h1>
-<p>When using data from local databases, such as CHIRPS or MODIS. The inputted <code>object</code> must be provided in a specific format. This is how the <code>object</code> should be organised for <code>rainfall()</code>. A matrix where column names are the days as extracted from CHIRPS. Let’s create some random values to simulate the input behaviour.</p>
-<pre class="r"><code>set.seed(999)
-rain &lt;- matrix(runif(150, 0, 2), ncol = 15, nrow = 10)
-dimnames(rain)[[2]] &lt;- as.character(as.Date(16005:16019, origin = &quot;1970-01-01&quot;))
-
-dates &lt;- as.Date(runif(10, 16005, 16008), origin = &quot;1970-01-01&quot;)
-
-rainfall(rain, 
-         day.one = dates,
-         span = 10)</code></pre>
-<p>The same for <code>temperature()</code>. But in that case the inputted <code>object</code> is an array with two layers, the first for the day temperature and the second for the night temperature.</p>
-<pre class="r"><code>set.seed(888)
-day &lt;- runif(150, 27, 35)
-night &lt;- runif(150, 20, 25)
-
-mod &lt;- array(c(day, night), dim = c(10, 15, 2))
-dimnames(mod)[[2]] &lt;- as.character(as.Date(16005:16019, origin = &quot;1970-01-01&quot;))
-
-dates &lt;- as.Date(runif(10, 16005, 16008), origin = &quot;1970-01-01&quot;)
-
-temperature(mod,
-            day.one = dates,
-            span = 10)</code></pre>
-</div>
-<div id="indices" class="section level1">
-<h1>Indices</h1>
-<p><strong>climatrends</strong> computes 18 temperature and precipitation indices:</p>
-<table>
-<colgroup>
-<col width="7%"></col>
-<col width="84%"></col>
-<col width="8%"></col>
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Index</th>
-<th align="left">Definition</th>
-<th align="left">Unit</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">maxDT</td>
-<td align="left">maximun day temperature</td>
-<td align="left">°C</td>
-</tr>
-<tr class="even">
-<td align="left">minDT</td>
-<td align="left">minimum day temperature</td>
-<td align="left">°C</td>
-</tr>
-<tr class="odd">
-<td align="left">maxNT</td>
-<td align="left">maximun night temperature</td>
-<td align="left">°C</td>
-</tr>
-<tr class="even">
-<td align="left">minNT</td>
-<td align="left">minimum night temperature</td>
-<td align="left">°C</td>
-</tr>
-<tr class="odd">
-<td align="left">DTR</td>
-<td align="left">diurnal temperature range (mean difference between DT and NT)</td>
-<td align="left">°C</td>
-</tr>
-<tr class="even">
-<td align="left">SU</td>
-<td align="left">summer days, number of days with maximum temperature &gt; 30 °C</td>
-<td align="left">days</td>
-</tr>
-<tr class="odd">
-<td align="left">TR</td>
-<td align="left">tropical nights, number of nights with maximum temperature &gt; 25 °C</td>
-<td align="left">days</td>
-</tr>
-<tr class="even">
-<td align="left">CFD</td>
-<td align="left">consecutive frosty days, number of days with temperature &lt; 0 °C</td>
-<td align="left">days</td>
-</tr>
-<tr class="odd">
-<td align="left">MLDS</td>
-<td align="left">maximum length of consecutive dry day, rain &lt; 1 mm</td>
-<td align="left">days</td>
-</tr>
-<tr class="even">
-<td align="left">MLWS</td>
-<td align="left">maximum length of consecutive wet day, rain &gt;= 1 mm</td>
-<td align="left">days</td>
-</tr>
-<tr class="odd">
-<td align="left">R10mm</td>
-<td align="left">heavy precipitation days 10 &gt;= rain &lt; 20 mm</td>
-<td align="left">days</td>
-</tr>
-<tr class="even">
-<td align="left">R20mm</td>
-<td align="left">very heavy precipitation days rain &gt;= 20</td>
-<td align="left">days</td>
-</tr>
-<tr class="odd">
-<td align="left">Rx1day</td>
-<td align="left">maximum 1-day precipitation</td>
-<td align="left">mm</td>
-</tr>
-<tr class="even">
-<td align="left">Rx5day</td>
-<td align="left">maximum 5-day precipitation</td>
-<td align="left">mm</td>
-</tr>
-<tr class="odd">
-<td align="left">R95p</td>
-<td align="left">total precipitation when rain &gt; 95th percentile</td>
-<td align="left">mm</td>
-</tr>
-<tr class="even">
-<td align="left">R99p</td>
-<td align="left">total precipitation when rain &gt; 99th percentile</td>
-<td align="left">mm</td>
-</tr>
-<tr class="odd">
-<td align="left">Rtotal</td>
-<td align="left">total precipitation in wet days, rain &gt;= 1 mm</td>
-<td align="left">mm</td>
-</tr>
-<tr class="even">
-<td align="left">SDII</td>
-<td align="left">simple daily intensity index, total precipitation divided by the number of wet days</td>
-<td align="left">mm/days</td>
-</tr>
-</tbody>
-</table>
 <div id="references" class="section level2 unnumbered">
 <h2 class="unnumbered">References</h2>
 <div id="refs" class="references">
@@ -659,29 +537,32 @@ temperature(mod,
 <div id="ref-Aguilar2005">
 <p>2. Aguilar, E., Peterson, T. C., Obando, P. R. &amp; Frutos, R. <em>et al.</em> Changes in precipitation and temperature extremes in Central America and northern South America, 1961–2003. <em>Journal of Geophysical Research</em> <strong>110</strong>, D23107 (2005).</p>
 </div>
+<div id="ref-Challinor2016">
+<p>3. Challinor, A. J., Koehler, A.-K., Ramirez-Villegas, J., Whitfield, S. &amp; Das, B. Current warming will reduce yields unless maize breeding and seed systems adapt immediately. <em>Nature Climate Change</em> <strong>6</strong>, 954–958 (2016).</p>
+</div>
+<div id="ref-Trnka2014">
+<p>4. Trnka, M., Rötter, R. P., Ruiz-Ramos, M. &amp; Kersebaum, K. C. <em>et al.</em> Adverse weather conditions for European wheat production will become more frequent with climate change. <em>Nature Climate Change</em> <strong>4</strong>, 637–643 (2014).</p>
+</div>
+<div id="ref-Zohner2020">
+<p>5. Zohner, C. M., Mo, L., Renner, S. S. &amp; Svenning, J.-C. <em>et al.</em> Late-spring frost risk between 1959 and 2017 decreased in North America but increased in Europe and Asia. <em>Proceedings of the National Academy of Sciences</em> 201920816 (2020). doi:<a href="https://doi.org/10.1073/pnas.1920816117">10.1073/pnas.1920816117</a></p>
+</div>
 <div id="ref-vanEtten2019">
-<p>3. van Etten, J., de Sousa, K., Aguilar, A. &amp; Barrios, M. <em>et al.</em> Crop variety management for climate adaptation supported by citizen science. <em>Proceedings of the National Academy of Sciences</em> <strong>116</strong>, 4194–4199 (2019).</p>
+<p>6. van Etten, J., de Sousa, K., Aguilar, A. &amp; Barrios, M. <em>et al.</em> Crop variety management for climate adaptation supported by citizen science. <em>Proceedings of the National Academy of Sciences</em> <strong>116</strong>, 4194–4199 (2019).</p>
 </div>
 <div id="ref-DeSousa2018">
-<p>4. de Sousa, K., Casanoves, F., Sellare, J. &amp; Ospina, A. <em>et al.</em> How climate awareness influences farmers’ adaptation decisions in Central America? <em>Journal of Rural Studies</em> <strong>64</strong>, 11–19 (2018).</p>
+<p>7. de Sousa, K., Casanoves, F., Sellare, J. &amp; Ospina, A. <em>et al.</em> How climate awareness influences farmers’ adaptation decisions in Central America? <em>Journal of Rural Studies</em> <strong>64</strong>, 11–19 (2018).</p>
 </div>
 <div id="ref-Sparks2018">
-<p>5. Sparks, A. H. nasapower: A NASA POWER Global Meteorology, Surface Solar Energy and Climatology Data Client for R. <em>Journal of Open Source Software</em> <strong>3</strong>, 1035 (2018).</p>
-</div>
-<div id="ref-Hijmans2015">
-<p>6. Hijmans, R. J., van Etten, J., Cheng, J. &amp; Mattiuzzi, M. <em>et al.</em> raster: Geographic Data Analysis and Modeling. R package version 2.5-8. (2015).</p>
-</div>
-<div id="ref-Funk2015">
-<p>7. Funk, C., Peterson, P., Landsfeld, M. &amp; Pedreros, D. <em>et al.</em> The climate hazards infrared precipitation with stations—a new environmental record for monitoring extremes. <em>Scientific Data</em> <strong>2</strong>, 150066 (2015).</p>
-</div>
-<div id="ref-Wan2015">
-<p>8. Wan, Z., Hook, S. &amp; Hulley, G. MYD11A1 MODIS/Aqua Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V006 [Data set]. <em>NASA EOSDIS LP DAAC</em> (2015). doi:<a href="https://doi.org/10.5067/MODIS/MYD11A1.006">10.5067/MODIS/MYD11A1.006</a></p>
+<p>8. Sparks, A. H. nasapower: A NASA POWER Global Meteorology, Surface Solar Energy and Climatology Data Client for R. <em>Journal of Open Source Software</em> <strong>3</strong>, 1035 (2018).</p>
 </div>
 <div id="ref-Prentice1992">
 <p>9. Prentice, I. C., Cramer, W., Harrison, S. P. &amp; Leemans, R. <em>et al.</em> Special Paper: A Global Biome Model Based on Plant Physiology and Dominance, Soil Properties and Climate. <em>Journal of Biogeography</em> <strong>19</strong>, 117 (1992).</p>
 </div>
+<div id="ref-JWu2013">
+<p>10. Wu, J., Guan, D., Yuan, F., Wang, A. &amp; Jin, C. Soil Temperature Triggers the Onset of Photosynthesis in Korean Pine. <em>PLoS ONE</em> <strong>8</strong>, e65401 (2013).</p>
+</div>
 <div id="ref-Brouwer1986">
-<p>10. Brouwer, C. &amp; Heibloem, M. <em>Irrigation water management: Irrigation water needs</em>. (Food; Agriculture Organization of The United Nations, 1986).</p>
+<p>11. Brouwer, C. &amp; Heibloem, M. <em>Irrigation water management: Irrigation water needs</em>. (Food; Agriculture Organization of The United Nations, 1986).</p>
 </div>
 </div>
 </div>
