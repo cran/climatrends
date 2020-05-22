@@ -1,6 +1,6 @@
 #' Crop sensitive indices
 #' 
-#' Compute crop sensitive indices. These indices are intended to capture 
+#' Compute crop sensitive indices. These indices are designed to capture 
 #'  the changes in temperature extremes during key phenological stages 
 #'  (e.g. anthesis), but can also be applied to other phenological stages.
 #' 
@@ -227,7 +227,7 @@ crop_sensitive.sf <- function(object, day.one, ..., as.sf = TRUE){
   
   if (isTRUE(as.sf)) {
     
-    result <- suppressWarnings(sf::st_bind_cols(object, result))
+    result <- cbind(object, result)
     
   }
   
