@@ -28,7 +28,7 @@
 #'  is: 'nasapower'
 #' 
 #' \code{pars}: character vector for the precipitation data to be fetched. If 
-#'  \code{data.from} is 'nasapower', the default precipitation parameter is "PRECTOT".
+#'  \code{data.from} is 'nasapower', the default precipitation parameter is "PRECTOTCORR".
 #' 
 #' \code{days.before}: optional, an integer for the number of days before 
 #'  \var{day.one} to be included in the timespan.
@@ -61,7 +61,7 @@
 #'  
 #' @references 
 #' Aguilar E., et al. (2005). Journal of Geophysical Research, 
-#' 110(D23), D23107. \cr\url{https://doi.org/10.1029/2005JD006119}
+#' 110(D23), D23107. \doi{https://doi.org/10.1029/2005JD006119}
 #' 
 #' @examples
 #' # A vector with precipitation data
@@ -83,31 +83,6 @@
 #'          day.one = "2013-10-28",
 #'          span = 12)
 #' 
-#' #####################################################
-#' \donttest{
-#' # Using remote sources of climate data
-#' library("nasapower")
-#' library("sf")
-#' data("lonlatsf", package = "climatrends")
-#' 
-#' # some random dates provided as integers and coerced to Dates internally
-#' set.seed(2718279)
-#' dates <- as.integer(runif(5, 17660, 17675))
-#' 
-#' # get precipitation indices for 30 days after day.one
-#' # return a data.frame
-#' rain1 <- rainfall(lonlatsf,
-#'                   day.one = dates,
-#'                   span = 30,
-#'                   as.sf = FALSE)
-#' rain1
-#' 
-#' # get precipitation indices from "2010-12-01" to "2011-01-31"
-#' rain2 <- rainfall(lonlatsf,
-#'                   day.one = "2010-12-01",
-#'                   last.day = "2011-01-31")
-#' rain2
-#' }
 #' 
 #' @importFrom stats quantile
 #' @export
@@ -170,7 +145,7 @@ rainfall.data.frame <- function(object, day.one, span = NULL, ...,
   day.one <- as.data.frame(day.one)[, 1]
   
   if (is.null(pars)) {
-    pars <- "PRECTOT"
+    pars <- "PRECTOTCORR"
   }
   
   rain <- get_timeseries(object, day.one, span, pars = pars, ...)[[1]]
@@ -315,7 +290,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
              .r_one_day(y),
              .r_five_day(y),
              .very_wet_days(y),
-             .extrem_wet_days(y),
+             .extreme_wet_days (y),
              .r_total(y),
              .sdii(y))
       
@@ -362,7 +337,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
                       .r_one_day(x),
                       .r_five_day(x),
                       .very_wet_days(x),
-                      .extrem_wet_days(x),
+                      .extreme_wet_days (x),
                       .r_total(x),
                       .sdii(x),
                       stringsAsFactors = FALSE)
@@ -398,7 +373,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
-#' chirps:::.dryspell(r)
+#' climatrends:::.dryspell(r)
 #' @noRd
 .dryspell <- function(x){
   if (all(is.na(x))) {
@@ -444,7 +419,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:11)] <- 0.1
-#' chirps:::.wetspell(r)
+#' climatrends:::.wetspell(r)
 #' @noRd
 .wetspell <- function(x){
   
@@ -488,7 +463,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 0, 12)
 #' r[c(1,4,9:11)] <- 0.1
-#' chirps:::.r_ten_mm(r)
+#' climatrends:::.r_ten_mm(r)
 #' @noRd
 .r_ten_mm <- function(x) {
   
@@ -510,7 +485,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 10, 23)
 #' r[c(1,4,9:11)] <- 0.1
-#' chirps:::.r_twenty_mm(r)
+#' climatrends:::.r_twenty_mm(r)
 #' @noRd
 .r_twenty_mm <- function(x) {
   
@@ -536,7 +511,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #'
 #' .sdii(r)
 #'
-#' chirps:::.sdii(rep(0.1, 9))
+#' climatrends:::.sdii(rep(0.1, 9))
 #' @noRd
 .sdii <- function(x){
   
@@ -569,7 +544,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
-#' chirps:::.r_five_day(r)
+#' climatrends:::.r_five_day(r)
 #' @noRd
 .r_five_day <- function(x){
   
@@ -608,7 +583,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
-#' chirps:::.r_one_day(r)
+#' climatrends:::.r_one_day(r)
 #' @noRd
 .r_one_day <- function(x) {
   
@@ -629,7 +604,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
-#' chirps:::.r_total(r)
+#' climatrends:::.r_total(r)
 #' @noRd
 .r_total <- function(x) {
   
@@ -653,7 +628,7 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
-#' chirps:::.very_wet_days(r)
+#' climatrends:::.very_wet_days(r)
 #' @noRd
 .very_wet_days <- function(x) {
   
@@ -672,16 +647,16 @@ rainfall.sf <- function(object, day.one, span = NULL, ...,
   
 }
 
-#' Extrem wet days
+#' Extreme wet days
 #' @param x numeric vector
 #' @return the R99p index, total PRCP when rain > 99th percentile
 #' @examples
 #' set.seed(12)
 #' r <- runif(20, 0, 9)
 #' r[c(1,4,9:12,17)] <- 0
-#' chirps:::.extrem_wet_days(r)
+#' chirps:::.extreme_wet_days(r)
 #' @noRd
-.extrem_wet_days <- function(x){
+.extreme_wet_days <- function(x){
   
   if (all(is.na(x))) {
     return(NA)
