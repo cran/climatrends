@@ -1,7 +1,7 @@
 Package: climatrends
 Type: Package
 Title: Climate Variability Indices for Ecological Modelling
-Version: 0.1.13
+Version: 0.2
 Authors@R: c(person("Kauê", "de Sousa", 
         email = "kaue.desousa@inn.no", role = c("aut", "cre"),
         comment = c(ORCID = "0000-0002-7571-7845")),
@@ -22,10 +22,10 @@ Language: en-GB
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2022-01-05 20:08:10 UTC; kauefeitosadiasdesousa
+Packaged: 2022-02-23 15:39:16 UTC; kauefeitosadiasdesousa
 Author: Kauê de Sousa [aut, cre] (<https://orcid.org/0000-0002-7571-7845>),
   Jacob van Etten [ctb, ths] (<https://orcid.org/0000-0001-7554-2558>),
   Svein Ø. Solberg [ctb, ths] (<https://orcid.org/0000-0002-4491-4483>)
 Maintainer: Kauê de Sousa <kaue.desousa@inn.no>
 Repository: CRAN
-Date/Publication: 2022-01-11 10:02:45 UTC
+Date/Publication: 2022-02-24 07:50:23 UTC
