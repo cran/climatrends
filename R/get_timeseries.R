@@ -87,7 +87,7 @@ get_timeseries.default <- function(object, day.one, span = NULL, last.day = NULL
   }
   
   sts <- .st_span(day.one, span, last.day, days.before)
-
+  
   object <- as.data.frame(object)
   
   makecall <- paste0(".", data.from)
@@ -97,7 +97,7 @@ get_timeseries.default <- function(object, day.one, span = NULL, last.day = NULL
                pars = pars)
   
   object <- do.call(makecall, args)
-
+  
   r <- lapply(object, function(x){
     .st_ts(x,
            days = sts$begin,
@@ -200,7 +200,7 @@ get_timeseries.matrix <- function(object, day.one, span = NULL, last.day = NULL,
 #' @method get_timeseries array
 #' @export
 get_timeseries.array <- function(object, day.one, span = NULL, last.day = NULL, 
-                                  ...){
+                                 ...){
   
   
   dm1 <- get_timeseries(object[,,1], day.one, span = span, last.day = last.day, ...)
@@ -245,14 +245,14 @@ get_timeseries.array <- function(object, day.one, span = NULL, last.day = NULL,
   if (!.is_Date(day.one)) {
     
     day.one <- .coerce2Date(day.one)
-  
+    
   }
   
   # the time span
   if (!is.null(span)) {
     
     span <- as.vector(t(span)) 
-  
+    
   }
   
   # or from last.day
@@ -458,7 +458,7 @@ get_timeseries.array <- function(object, day.one, span = NULL, last.day = NULL,
                 nrow = nr,
                 ncol = (sp * npars),
                 dimnames = list(1:nr))
-
+  
   
   for (i in seq_len(nregions)) {
     
@@ -470,7 +470,7 @@ get_timeseries.array <- function(object, day.one, span = NULL, last.day = NULL,
                            floor(min(lonlat_i[, 2])),
                            ceiling(max(lonlat_i[, 1]) + 2),
                            ceiling(max(lonlat_i[, 2])) + 2))
-
+    
     args <- list(community = community,
                  lonlat = lims,
                  pars = pars,
@@ -542,7 +542,7 @@ get_timeseries.array <- function(object, day.one, span = NULL, last.day = NULL,
       result[[i]] <- rs
     }
   }
- 
+  
   if (length(pars) == 1) {
     dat <- as.data.frame(dat)
     names(dat) <- namedays
@@ -554,4 +554,3 @@ get_timeseries.array <- function(object, day.one, span = NULL, last.day = NULL,
   return(result)
   
 }
-
